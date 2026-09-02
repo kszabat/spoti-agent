@@ -30,9 +30,7 @@ def search_tracks(ctx: RunContext[Deps], query: str, limit: int = 5) -> str:
         limit: The maximum number of tracks to return (default is 5)
     """
 
-    results = ctx.deps.spotify.search(
-        q=query, type="track", limit=limit
-    )
+    results = ctx.deps.spotify.search(q=query, type="track", limit=limit)
 
     found_tracks = results.get("tracks", {}).get("items", [])
 
@@ -51,3 +49,27 @@ def search_tracks(ctx: RunContext[Deps], query: str, limit: int = 5) -> str:
     answer += "\n".join(track_info_list)
 
     return answer
+
+
+@agent.tool
+def play_track(ctx: RunContext[Deps], track_uri: str) -> str:
+    """Play a specific track on Spotify.
+    Use this tool when you want to play a specific track by its URI.
+    Usually, you would first search for the track using the `search_tracks` tool and then use this tool to play it.
+
+    Args:
+        track_uri: The Spotify URI of the track to play, e.g. spotify:track:6nmDEbjMZru5j55HIkX2yZ
+    """
+
+    sp = ctx.deps.spotify
+    device_id = _get_playback_device_id(sp)
+
+    if not device_id:
+        return "No active playback device found. Please ensure you have a Spotify client open and logged in."
+
+    try:
+        sp.start_playback(device_id=device_id, uris=[track_uri])
+    except spotipy.SpotifyException as e:
+        return f"Failed to start playback: {e}"
+
+    return f"Playback started for track URI: {track_uri}"
