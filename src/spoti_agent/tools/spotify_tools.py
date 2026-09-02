@@ -73,3 +73,35 @@ def play_track(ctx: RunContext[Deps], track_uri: str) -> str:
         return f"Failed to start playback: {e}"
 
     return f"Playback started for track URI: {track_uri}"
+
+
+@agent.tool
+def play_song_by_name(ctx: RunContext[Deps], song_name: str):
+    """Search for a song by name and play best match right away.
+    This tool combines searching and playing a song in one step.
+    Use this tool when user asks to play a song by name, e.g., "Play 'Diamond Eyes' by Deftones" and you don't need to choose from multiple search results.
+
+    Args:
+        song_name: The name of the song to search and play, e.g., "Diamond Eyes by Deftones"
+    """
+
+    sp = ctx.deps.spotify
+    results = sp.search(q=song_name, type="track", limit=1)
+    track = results.get("tracks", {}).get("items", [None])[0]
+
+    if not track:
+        return f"No tracks found for the query: {song_name!r}"
+
+    device_id = _get_playback_device_id(sp)
+    if not device_id:
+        return "No active playback device found. Please ensure you have a Spotify client open and logged in."
+
+    try:
+        sp.start_playback(device_id=device_id, uris=[track["uri"]])
+    except spotipy.SpotifyException as e:
+        return f"Failed to start playback: {e}"
+
+    artists = ", ".join(artist.get("name") for artist in track.get("artists", []))
+    answer = f"Playback started for '{track.get('name')}' by {artists})"
+
+    return answer
