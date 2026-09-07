@@ -2,8 +2,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 from .agent import agent
-from .deps import Deps
 from .config import get_settings
+from .deps import Deps
 
 
 def main() -> None:
@@ -28,7 +28,7 @@ def main() -> None:
             break
 
         result = agent.run_sync(user_prompt=user_input, deps=deps)
-        print(f"Agent: {result}")
+        print(f"Agent: {result.output}")
 
 
 if __name__ == "__main__":
