@@ -6,8 +6,10 @@ from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
 from spotipy.oauth2 import SpotifyOAuth
 
+from spotipy.cache_handler import CacheFileHandler
+
 from .agent import agent
-from .config import get_settings
+from .config import PROJECT_ROOT, get_settings
 from .deps import Deps
 
 app = typer.Typer(add_completion=False)
@@ -35,6 +37,7 @@ def main(
             redirect_uri=settings.spotify_redirect_uri,
             scope="user-modify-playback-state user-read-playback-state "
             "user-library-modify user-library-read",
+            cache_handler=CacheFileHandler(cache_path=PROJECT_ROOT / ".spotify-cache"),
         )
     )
     deps = Deps(spotify=sp)
