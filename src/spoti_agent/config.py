@@ -3,11 +3,11 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=_PROJECT_ROOT / ".env", extra="ignore", env_file_encoding="utf-8"
+        env_file=PROJECT_ROOT / ".env", extra="ignore", env_file_encoding="utf-8"
     )
 
     spotify_client_id: str
