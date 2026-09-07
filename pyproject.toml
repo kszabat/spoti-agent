@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.13.5",
     "pydantic-ai>=2.37.0",
     "pydantic-ai-harness>=0.28.0",
+    "pydantic-ai-slim[duckduckgo]>=2.37.0",
     "pydantic-settings>=2.15.0",
     "spotipy>=2.26.0",
 ]
