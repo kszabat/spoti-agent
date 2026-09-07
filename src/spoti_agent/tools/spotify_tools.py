@@ -105,3 +105,107 @@ def play_song_by_name(ctx: RunContext[Deps], song_name: str):
     answer = f"Playback started for '{track.get('name')}' by {artists})"
 
     return answer
+
+
+@agent.tool
+def pause_playback(ctx: RunContext[Deps]) -> str:
+    """Pause the current playback on Spotify.
+    Use this tool when you want to pause the currently playing track.
+
+    Returns:
+        A message indicating whether the playback was successfully paused or if there was an error.
+    """
+
+    sp = ctx.deps.spotify
+    device_id = _get_playback_device_id(sp)
+
+    if not device_id:
+        return "No active playback device found. Please ensure you have a Spotify client open and logged in."
+
+    try:
+        sp.pause_playback(device_id=device_id)
+    except spotipy.SpotifyException as e:
+        return f"Failed to pause playback: {e}"
+
+    return "Playback paused successfully."
+
+
+@agent.tool
+def resume_playback(ctx: RunContext[Deps]) -> str:
+    """Resume the current playback on Spotify.
+    Use this tool when you want to resume the currently paused track.
+
+    Returns:
+        A message indicating whether the playback was successfully resumed or if there was an error.
+    """
+
+    sp = ctx.deps.spotify
+    device_id = _get_playback_device_id(sp)
+
+    if not device_id:
+        return "No active playback device found. Please ensure you have a Spotify client open and logged in."
+
+    try:
+        sp.start_playback(device_id=device_id)
+    except spotipy.SpotifyException as e:
+        return f"Failed to resume playback: {e}"
+
+    return "Playback resumed successfully."
+
+
+@agent.tool
+def get_current_playback(ctx: RunContext[Deps]) -> str:
+    """Get information about the current playback on Spotify.
+    Use this tool when you want to know what track is currently playing, along with its details.
+
+    Returns:
+        A message containing information about the currently playing track or indicating that nothing is playing.
+    """
+
+    sp = ctx.deps.spotify
+    playback_info = sp.current_playback()
+
+    if (
+        not playback_info
+        or not playback_info.get("is_playing")
+        or not playback_info.get("item")
+    ):
+        return "No track is currently playing."
+
+    track = playback_info.get("item")
+    track_name = track.get("name")
+    artists = ", ".join(artist.get("name") for artist in track.get("artists", []))
+    album = track.get("album", {}).get("name")
+
+    answer = f"Currently playing: '{track_name}' by {artists} from the album '{album}'."
+
+    return answer
+
+
+@agent.tool
+def add_current_track_to_favurites(ctx: RunContext[Deps]):
+    """Add the currently playing track to the user's Spotify favorites (liked songs).
+    Use this tool when you want to like the currently playing track.
+
+    Returns:
+        A message indicating whether the track was successfully added to favorites or if there was an error.
+    """
+
+    sp = ctx.deps.spotify
+    playback_info = sp.current_playback()
+
+    if not playback_info or not playback_info.get("item"):
+        return "No track is currently playing."
+
+    track = playback_info.get("item")
+    track_id = track.get("id")
+
+    if not track_id:
+        return "Failed to retrieve the current track's ID."
+
+    try:
+        sp.current_user_saved_tracks_add([track_id])
+    except spotipy.SpotifyException as e:
+        return f"Failed to add the current track to favorites: {e}"
+
+    return f"'{track.get('name')}' by {', '.join(artist.get('name') for artist in track.get('artists', []))} has been added to your favorites."
