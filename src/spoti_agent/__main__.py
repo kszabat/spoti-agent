@@ -42,7 +42,7 @@ def main(
     model_override = None
     if model is not None:
         model_override = GoogleModel(
-            model, provider=GoogleProvider(settings.api_key)
+            model, provider=GoogleProvider(api_key=settings.api_key)
         )
 
     agent.to_cli_sync(deps=deps, prog_name="spoti-agent", model=model_override)

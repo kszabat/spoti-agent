@@ -10,7 +10,7 @@ from .deps import Deps
 settings = get_settings()
 
 model = GoogleModel(
-    settings.model, provider=GoogleProvider(settings.api_key)
+    settings.model, provider=GoogleProvider(api_key=settings.api_key)
 )
 
 agent = Agent(
