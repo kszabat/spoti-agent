@@ -1,15 +1,16 @@
 from pydantic_ai import Agent
 from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
-from pydantic_ai.models.ollama import OllamaModel
-from pydantic_ai.providers.ollama import OllamaProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
+
 
 from .config import get_settings
 from .deps import Deps
 
 settings = get_settings()
 
-model = OllamaModel(
-    settings.ollama_model, provider=OllamaProvider(settings.ollama_base_url)
+model = GoogleModel(
+    settings.model, provider=GoogleProvider(settings.api_key)
 )
 
 agent = Agent(

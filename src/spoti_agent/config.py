@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     spotify_client_secret: str
     spotify_redirect_uri: str = "http://127.0.0.1:8888/callback"
 
-    ollama_base_url: str = "http://localhost:11434/v1"
-    ollama_model: str = "qwen3:4b"
+    model: str = "gemini-3-flash-preview"
+    api_key: str
 
 
 @lru_cache

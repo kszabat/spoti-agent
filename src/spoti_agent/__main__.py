@@ -2,8 +2,8 @@ from typing import Annotated
 
 import spotipy
 import typer
-from pydantic_ai.models.ollama import OllamaModel
-from pydantic_ai.providers.ollama import OllamaProvider
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 from spotipy.oauth2 import SpotifyOAuth
 
 from .agent import agent
@@ -41,8 +41,8 @@ def main(
 
     model_override = None
     if model is not None:
-        model_override = OllamaModel(
-            model, provider=OllamaProvider(base_url=settings.ollama_base_url)
+        model_override = GoogleModel(
+            model, provider=GoogleProvider(settings.api_key)
         )
 
     agent.to_cli_sync(deps=deps, prog_name="spoti-agent", model=model_override)
